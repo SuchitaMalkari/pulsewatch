@@ -137,6 +137,14 @@ A validation error:
 }
 ```
 
+## Deployment
+
+The live demo runs on [Render](https://render.com) from the `Dockerfile`. A multi-stage build compiles the React dashboard, bundles it into the Spring Boot jar as static files, and ships one small Java runtime image. It uses the in-memory `h2` profile with demo mode on, so the demo services and their outages are always there. Every push to `main` redeploys it automatically (`render.yaml`).
+
+```bash
+docker build -t pulsewatch . && docker run -p 8080:8080 pulsewatch   # then open http://localhost:8080
+```
+
 ## Tests
 
 ```bash

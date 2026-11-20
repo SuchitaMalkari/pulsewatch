@@ -1,0 +1,8 @@
+# Render blueprint: one free web service built from the Dockerfile.
+services:
+  - type: web
+    name: pulsewatch
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    autoDeploy: true
