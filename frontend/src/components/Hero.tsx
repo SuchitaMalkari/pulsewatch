@@ -59,7 +59,6 @@ export function Hero({ monitors, incidents, now, onAdd }: HeroProps) {
         <div className="hero-content">
           <h1 id="hero-title" className="hero-title">
             <PullUp segments={[{ text: 'Pulse' }, { text: 'watch', className: 'serif', attached: true }]} stagger={120} />
-            <sup className="hero-mark">*</sup>
           </h1>
 
           <div className="hero-side">

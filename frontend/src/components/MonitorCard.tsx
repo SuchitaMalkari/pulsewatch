@@ -26,7 +26,7 @@ export function MonitorCard({ monitor, selected, now, onSelect }: MonitorCardPro
         <StatusPill status={monitor.status} />
       </div>
 
-      <Sparkline values={monitor.recentLatencies} threshold={monitor.latencyThresholdMs} />
+      <Sparkline values={monitor.recentLatencies} threshold={monitor.latencyThresholdMs} seed={monitor.id} />
 
       <dl className="metrics">
         <div>

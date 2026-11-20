@@ -71,19 +71,14 @@ button { font: inherit; color: inherit; }
 
 /* Hero */
 .hero { height: 100vh; min-height: 620px; max-height: 1000px; padding: clamp(12px, 1.6vw, 24px) 0 0; }
-.hero-frame {
+.hero-frame { /* always the red "monitor" look from the first sketch */
   position: relative; height: 100%; overflow: hidden; border-radius: clamp(18px, 2.2vw, 34px);
-  background:
-    radial-gradient(900px 500px at 78% 30%, rgba(222, 219, 200, 0.10), transparent 60%),
-    radial-gradient(700px 420px at 10% 100%, rgba(159, 216, 168, 0.06), transparent 60%),
-    linear-gradient(180deg, #0b0b0b 0%, #050505 100%);
-  border: 1px solid var(--line);
-}
-.hero-alert .hero-frame {
   background:
     radial-gradient(900px 500px at 78% 30%, rgba(240, 121, 106, 0.16), transparent 60%),
     linear-gradient(180deg, #0f0807 0%, #050505 100%);
+  border: 1px solid var(--line);
 }
+.hero-alert .hero-frame { border-color: rgba(240, 121, 106, 0.35); }
 .noise { position: absolute; inset: 0; background-image: var(--grain); opacity: 0.55; mix-blend-mode: overlay; pointer-events: none; }
 
 .hero-nav {
@@ -99,9 +94,8 @@ button { font: inherit; color: inherit; }
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
 .hero-pulse svg { width: 200%; height: 100%; display: block; }
 .hero-pulse-track { animation: pulse-scroll 26s linear infinite; }
-.hero-pulse path { fill: none; stroke: var(--cream); stroke-width: 1.6; stroke-linejoin: round; opacity: 0.55;
-  vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 6px rgba(225, 224, 204, 0.45)); }
-.hero-alert .hero-pulse path { stroke: var(--down); opacity: 0.8; filter: drop-shadow(0 0 8px rgba(240, 121, 106, 0.6)); }
+.hero-pulse path { fill: none; stroke: var(--down); stroke-width: 1.6; stroke-linejoin: round; opacity: 0.8;
+  vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px rgba(240, 121, 106, 0.6)); }
 @keyframes pulse-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 .hero-content {
@@ -115,7 +109,6 @@ button { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 .hero-title .serif { letter-spacing: -0.04em; }
-.hero-mark { position: absolute; top: 0.04em; right: -0.34em; font-size: 0.28em; color: var(--primary); }
 .hero-side {
   order: 1; align-self: flex-end; width: min(420px, 100%);
   display: flex; flex-direction: column; gap: 18px;
@@ -208,11 +201,25 @@ button { font: inherit; color: inherit; }
 .pill-down .pill-dot { animation: pulse 1.2s infinite; }
 .pill-paused { color: var(--paused); }
 
-/* Sparkline */
-.sparkline { width: 100%; height: 40px; }
-.sparkline-line { fill: none; stroke: var(--cream); stroke-width: 1.5; stroke-linejoin: round; opacity: 0.8; }
-.sparkline-line.warn { stroke: var(--degraded); opacity: 1; }
-.status-down .sparkline-line { stroke: var(--down); }
+/* Sparkline: static trace plus a glowing head that sweeps along it, like a monitor */
+.sparkline { width: 100%; height: 40px; overflow: visible; }
+.sparkline polyline { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.sparkline-line { stroke: var(--cream); stroke-width: 1.2; opacity: 0.18; }
+.sparkline-trail { stroke: var(--cream); stroke-width: 1.6; stroke-dasharray: 550 450; opacity: 0.85;
+  animation: sweep-trail 4s linear infinite; }
+.sparkline-head { stroke: #fff; stroke-width: 3.5; stroke-dasharray: 5 995;
+  animation: sweep-head 4s linear infinite; filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px var(--cream)); }
+.sparkline .warn { stroke: var(--degraded); }
+.sparkline-head.warn { filter: drop-shadow(0 0 4px var(--degraded)) drop-shadow(0 0 9px var(--degraded)); }
+.status-up .sparkline-trail { stroke: var(--up); }
+.status-up .sparkline-head { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px var(--up)); }
+.status-down .sparkline polyline { stroke: var(--down); }
+.status-down .sparkline-head { stroke: #ffe1dc; filter: drop-shadow(0 0 4px var(--down)) drop-shadow(0 0 10px var(--down)); }
+.status-down .sparkline-trail, .status-down .sparkline-head { animation-duration: 2.6s; }
+.status-paused .sparkline-trail, .status-paused .sparkline-head { animation-play-state: paused; opacity: 0.25; }
+/* Trail is 55% of the line; the head is a short dash kept at the trail's leading edge. */
+@keyframes sweep-trail { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
+@keyframes sweep-head { from { stroke-dashoffset: 455; } to { stroke-dashoffset: -545; } }
 .sparkline-threshold { stroke: var(--line-strong); stroke-dasharray: 2 4; }
 .sparkline-empty { height: 40px; display: flex; align-items: center; color: var(--faint); font-size: 0.8rem; }
 
@@ -245,7 +252,7 @@ button { font: inherit; color: inherit; }
 .grid-line { stroke: var(--line); stroke-width: 1; }
 .threshold-line { stroke: var(--degraded); stroke-dasharray: 4 5; stroke-width: 1; opacity: 0.8; }
 .axis-label { fill: var(--faint); font-size: 10px; font-family: var(--mono); }
-.threshold-label { fill: var(--degraded); }
+.threshold-label { fill: var(--degraded); paint-order: stroke; stroke: #0e0e0e; stroke-width: 4px; stroke-linejoin: round; }
 /* Each bar is a dim track; a coloured light fills it from the bottom up and drains back down. */
 .bar-up { fill: var(--up); --glow: var(--up); }
 .bar-degraded { fill: var(--degraded); --glow: var(--degraded); }
@@ -323,4 +330,6 @@ g:hover > .bar-fill { animation-play-state: paused; transform: scaleY(1); opacit
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition: none !important; }
   .hero-pulse-track { animation: none; }
   .bar-fill { transform: none; }
+  .sparkline-head { display: none; }
+  .sparkline-trail { stroke-dasharray: none; }
 }
