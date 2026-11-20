@@ -9,13 +9,21 @@ const ORDER: { status: MonitorStatus; label: string }[] = [
   { status: 'PAUSED', label: 'Paused' },
 ];
 
-export function SummaryBar({ monitors, openIncidents }: { monitors: Monitor[]; openIncidents: number }) {
+interface SummaryBarProps {
+  monitors: Monitor[];
+  openIncidents: number;
+  connected: boolean;
+  onAdd: () => void;
+}
+
+/** Sticky status strip: overall health, counts, live-connection state and the add button. */
+export function SummaryBar({ monitors, openIncidents, connected, onAdd }: SummaryBarProps) {
   const overall = overallStatus(monitors);
   const count = (status: MonitorStatus) => monitors.filter((m) => m.status === status).length;
 
   return (
-    <section className={`summary summary-${overall.level}`} aria-live="polite">
-      <div className="summary-headline">
+    <div className={`summary summary-${overall.level}`}>
+      <div className="summary-headline" aria-live="polite">
         <span className="summary-dot" aria-hidden="true" />
         <strong>{overall.text}</strong>
         {openIncidents > 0 && (
@@ -29,6 +37,14 @@ export function SummaryBar({ monitors, openIncidents }: { monitors: Monitor[]; o
           </li>
         ))}
       </ul>
-    </section>
+      <div className="summary-actions">
+        <span className={`live ${connected ? 'live-on' : 'live-off'}`}
+              title={connected ? 'Receiving live updates' : 'Reconnecting; polling every 15s'}>
+          <span className="live-dot" aria-hidden="true" />
+          {connected ? 'Live' : 'Reconnecting'}
+        </span>
+        <button type="button" className="btn btn-primary btn-sm" onClick={onAdd}>+ Add</button>
+      </div>
+    </div>
   );
 }

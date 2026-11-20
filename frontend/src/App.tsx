@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from './api';
+import { Hero } from './components/Hero';
 import { IncidentList } from './components/IncidentList';
 import { MonitorCard } from './components/MonitorCard';
 import { MonitorDetail } from './components/MonitorDetail';
 import { MonitorForm } from './components/MonitorForm';
+import { PullUp } from './components/PullUp';
 import { SummaryBar } from './components/SummaryBar';
 import type { Incident, Monitor, MonitorInput } from './types';
 import { useLiveUpdates } from './useLiveUpdates';
@@ -86,35 +88,27 @@ export default function App() {
     setForm({ mode: 'closed' });
   }
 
+  const openForm = () => setForm({ mode: 'create' });
+
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
-            <rect width="32" height="32" rx="8" className="brand-bg" />
-            <path d="M4 17h6l3-8 5 15 3-7h7" className="brand-pulse" />
-          </svg>
-          <span>PulseWatch</span>
-        </div>
-        <div className="topbar-right">
-          <span className={`live ${connected ? 'live-on' : 'live-off'}`} title={connected ? 'Receiving live updates' : 'Reconnecting; polling every 15s'}>
-            <span className="live-dot" aria-hidden="true" />
-            {connected ? 'Live' : 'Reconnecting'}
-          </span>
-          <button type="button" className="btn btn-primary" onClick={() => setForm({ mode: 'create' })}>
-            + Add monitor
-          </button>
-        </div>
-      </header>
+      <Hero monitors={monitors} incidents={incidents} now={now} onAdd={openForm} />
 
-      <main className="content">
+      <SummaryBar monitors={monitors} openIncidents={openIncidents} connected={connected} onAdd={openForm} />
+
+      <main className="content" id="monitors">
+        <header className="section-head">
+          <p className="eyebrow">Live status</p>
+          <h2 className="section-heading">
+            <PullUp segments={[{ text: 'Every service,' }, { text: 'in real time.', className: 'serif' }]} delay={200} />
+          </h2>
+        </header>
+
         {loadError && (
           <div className="banner-error" role="alert">
             {loadError} <button type="button" className="link" onClick={() => void refresh()}>Retry</button>
           </div>
         )}
-
-        <SummaryBar monitors={monitors} openIncidents={openIncidents} />
 
         <div className={`layout${selected ? ' with-detail' : ''}`}>
           <div className="main-column">
@@ -126,7 +120,7 @@ export default function App() {
               <div className="card empty-state">
                 <h2>No monitors yet</h2>
                 <p className="muted">Add the URL of any API or website. PulseWatch checks it on a schedule, charts its latency and opens an incident when it goes down.</p>
-                <button type="button" className="btn btn-primary" onClick={() => setForm({ mode: 'create' })}>Add your first monitor</button>
+                <button type="button" className="btn btn-primary" onClick={openForm}>Add your first monitor</button>
               </div>
             ) : (
               <div className="grid">
@@ -158,7 +152,7 @@ export default function App() {
             )}
           </div>
 
-          <aside className="side-column">
+          <aside className="side-column" id="incidents">
             <IncidentList incidents={incidents} now={now} onSelectMonitor={setSelectedId} />
           </aside>
         </div>
@@ -172,8 +166,9 @@ export default function App() {
         />
       )}
 
-      <footer className="footer muted small">
-        PulseWatch · Spring Boot + React · checks run server-side and stream to this page over Server-Sent Events
+      <footer className="footer">
+        <span className="footer-brand">Pulse<span className="serif">watch</span></span>
+        <span className="muted small">Spring Boot · PostgreSQL · React · checks run server-side and stream here over Server-Sent Events</span>
       </footer>
     </div>
   );

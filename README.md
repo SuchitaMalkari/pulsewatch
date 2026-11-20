@@ -13,6 +13,7 @@
 - **Incident detection without false alarms.** A monitor is marked DOWN only after N failed checks in a row (default 3). The incident's start time is backdated to the first failure, and the first good check resolves it.
 - **UP / SLOW / DOWN.** A correct but slow response counts as degraded, not down.
 - **Live dashboard.** Status, latency and incidents update instantly through Server-Sent Events, with automatic reconnect and a polling fallback.
+- **A hero drawn from live data.** The animated heartbeat at the top is generated from the latest check latencies of every monitor. It turns red the moment any service is down.
 - **Latency analytics.** 24-hour uptime, p95 latency, a sparkline per monitor and a per-check latency chart.
 - **Consistent API errors.** Validation, malformed-JSON and not-found errors all return RFC 9457 problem-details JSON. Validation errors include a message for each field, which the form shows inline.
 - **Built-in demo services.** These include a healthy endpoint, a slow one and one with a 45-second outage every 3 minutes, so the app shows real incidents with no setup.
@@ -67,7 +68,7 @@ The rules live in `StatusEvaluator`, a pure function with no I/O, so every trans
 |---|---|
 | Backend | Java 17, Spring Boot 4, Spring Data JPA (Hibernate), Bean Validation, Flyway, Actuator |
 | Database | PostgreSQL 16 (H2 in-memory for tests and quick demos) |
-| Frontend | React 18, TypeScript (strict), Vite, hand-built SVG charts (no chart library) |
+| Frontend | React 18, TypeScript (strict), Vite, hand-built SVG charts and CSS animations (no chart or animation library) |
 | Testing | JUnit 5, AssertJ, Spring MockMvc, Vitest |
 | CI | GitHub Actions (backend and frontend jobs) |
 

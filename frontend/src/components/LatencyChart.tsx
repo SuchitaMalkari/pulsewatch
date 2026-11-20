@@ -10,7 +10,10 @@ const WIDTH = 640;
 const HEIGHT = 180;
 const PAD = { top: 12, right: 12, bottom: 22, left: 52 };
 
-/** Bar chart of recent checks: height is latency, colour is the outcome. */
+/**
+ * Bar chart of recent checks: height is latency, colour is the outcome (green up, amber slow,
+ * red down). Light pulses up and down inside each bar, like a level meter.
+ */
 export function LatencyChart({ checks, threshold }: LatencyChartProps) {
   if (checks.length === 0) {
     return <div className="chart-empty">No checks yet. Use “Check now” or wait for the next scheduled check.</div>;
@@ -41,26 +44,28 @@ export function LatencyChart({ checks, threshold }: LatencyChartProps) {
       ))}
 
       {ordered.map((check, i) => {
-        // A failed check is often fast (an instant 503), so its bar would be tiny. Shade the
-        // whole column red so outages stand out at a glance.
+        // A failed check is often fast (an instant 503), so its bar would be tiny. Draw it
+        // full height so outages stand out at a glance.
         const failed = check.outcome === 'DOWN';
         const top = failed ? PAD.top : y(Math.max(check.latencyMs, max * 0.01));
+        const x = PAD.left + i * slot + (slot - barW) / 2;
+        const height = PAD.top + plotH - top;
+        // Each bar pulses on its own rhythm (not a left-to-right wave), like a level meter.
+        const pulse = {
+          animationDuration: `${(1.3 + ((i * 0.37) % 1) * 0.9).toFixed(2)}s`,
+          animationDelay: `-${(((i * 0.618) % 1) * 2).toFixed(2)}s`,
+        };
+        const outcome = check.outcome.toLowerCase();
         return (
-          <rect
-            key={check.id}
-            x={PAD.left + i * slot + (slot - barW) / 2}
-            y={top}
-            width={barW}
-            height={PAD.top + plotH - top}
-            rx={1.5}
-            className={`bar bar-${check.outcome.toLowerCase()}`}
-          >
+          <g key={check.id}>
+            <rect x={x} y={top} width={barW} height={height} rx={1.5} className={`bar-track bar-${outcome}`} />
+            <rect x={x} y={top} width={barW} height={height} rx={1.5} className={`bar-fill bar-${outcome}`} style={pulse} />
             <title>
               {`${new Date(toMillis(check.checkedAt) ?? 0).toLocaleTimeString()} · ${check.outcome} · ` +
                 `${check.statusCode ?? 'no response'} · ${formatLatency(check.latencyMs)}` +
                 (check.error ? ` · ${check.error}` : '')}
             </title>
-          </rect>
+          </g>
         );
       })}
 
