@@ -4,6 +4,8 @@
 
 ![CI](https://github.com/SuchitaMalkari/pulsewatch/actions/workflows/ci.yml/badge.svg)
 
+**Live demo: [pulsewatch-883d.onrender.com](https://pulsewatch-883d.onrender.com)** (free hosting: the first visit after a quiet period takes about 40 seconds to wake up)
+
 <!-- Screenshot: run the app, then save a screenshot as docs/dashboard.png and uncomment the next line. -->
 <!-- ![PulseWatch dashboard](docs/dashboard.png) -->
 
